@@ -1,0 +1,206 @@
+openapi: 3.0.3
+info:
+  title: EcoMarket API
+  description: API para la gestión de productos orgánicos. ¡Ahora con imágenes!
+  version: 1.1.0 # Subimos la versión por el cambio
+  contact:
+    name: Equipo de Desarrollo EcoMarket
+    email: dev@ecomarket.com
+
+servers:
+  - url: https://api.ecomarket.com/v1
+    description: Servidor de Producción
+  - url: http://localhost:8000/v1
+    description: Servidor de Desarrollo Local
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "Datos de entrada inválidos"
+        details:
+          type: string
+          example: "El campo 'precio' no puede ser negativo"
+
+    ProductoBase:
+      type: object
+      description: Datos básicos del producto compartidos entre input y output.
+      required:
+        - nombre
+        - precio
+        - categoria
+        - productor_id
+      properties:
+        nombre:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: "Miel Orgánica de Yucatán"
+        descripcion: # ¡Aquí está la descripción que pediste!
+          type: string
+          nullable: true
+          description: Detalle completo del producto.
+          example: "Miel 100% pura de abeja melipona, cosecha 2025. Frasco de 500ml."
+        imagen: # ¡Aquí está la nueva mejora de imagen!
+          type: string
+          format: uri
+          nullable: true # Es opcional, puede no tener imagen al principio
+          description: URL pública de la imagen principal del producto.
+          example: "https://storage.ecomarket.com/productos/miel-abeja.jpg"
+        precio:
+          type: number
+          format: double
+          minimum: 0.01
+          description: Precio unitario en moneda local (2 decimales).
+          example: 150.50
+        categoria:
+          type: string
+          enum: [frutas, verduras, lacteos, miel, conservas]
+          example: "miel"
+        productor_id:
+          type: string
+          format: uuid
+          description: ID único del productor dueño del producto.
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        disponible:
+          type: boolean
+          default: true
+          example: true
+
+    ProductoInput:
+      allOf:
+        - $ref: '#/components/schemas/ProductoBase'
+
+    ProductoOutput:
+      allOf:
+        - $ref: '#/components/schemas/ProductoBase'
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              readOnly: true
+              example: "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+            creado_en:
+              type: string
+              format: date-time
+              readOnly: true
+              example: "2023-10-27T10:00:00Z"
+
+paths:
+  /productos:
+    get:
+      summary: Listar productos disponibles
+      description: Obtiene una lista paginada de productos. Permite filtrar por categoría y productor.
+      operationId: getProducts
+      parameters:
+        - name: categoria
+          in: query
+          description: Filtrar por categoría de producto.
+          required: false
+          schema:
+            type: string
+            enum: [frutas, verduras, lacteos, miel, conservas]
+        - name: productor_id
+          in: query
+          description: Filtrar productos de un productor específico.
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de productos obtenida exitosamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductoOutput'
+        '400':
+          description: Parámetros de filtro inválidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: 400
+                message: "Categoría inválida"
+
+    post:
+      summary: Crear un nuevo producto
+      description: Registra un nuevo producto en el catálogo. Requiere autenticación de productor.
+      operationId: createProduct
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Datos del producto a crear.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoInput'
+      responses:
+        '201':
+          description: Producto creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductoOutput'
+        '400':
+          description: Error de validación en los datos enviados.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: 400
+                message: "Datos inválidos"
+        '401':
+          description: No autorizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /productos/{id}:
+    get:
+      summary: Ver detalle de un producto
+      description: Obtiene la información completa de un producto específico por su ID.
+      operationId: getProductById
+      parameters:
+        - name: id
+          in: path
+          description: ID único del producto.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Detalle del producto encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductoOutput'
+        '404':
+          description: Producto no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: 404
+                message: "Recurso no encontrado"
