@@ -1,0 +1,100 @@
+openapi: 3.0.0
+info:
+  title: EcoMarket API
+  description: API para la gestión de mercado ecológico (Productos, Productores y Pedidos).
+  version: 1.1.0
+servers:
+  - url: http://localhost:9999
+    description: Servidor de Desarrollo
+
+paths:
+  # --- RECURSO: PRODUCTOS ---
+  /productos:
+    get:
+      operationId: listar_productos
+      summary: Listar productos
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Término de búsqueda
+      responses:
+        '200':
+          description: Lista obtenida.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Producto'
+    post:
+      operationId: crear_producto
+      summary: Crear producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoNuevo'
+      responses:
+        '201':
+          description: Creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+
+  /productos/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+    get:
+      operationId: obtener_producto
+      summary: Detalle producto
+      responses:
+        '200':
+          description: Detalle encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+        '404':
+          description: No encontrado.
+
+components:
+  schemas:
+    # Esquema completo (Lectura)
+    Producto:
+      type: object
+      required: [id, nombre, precio, category]
+      properties:
+        id: 
+          type: string
+        nombre: 
+          type: string
+        precio: 
+          type: number
+          minimum: 0
+        stock: 
+          type: integer
+        categoria: 
+          type: string
+    
+    # Esquema para escritura (sin ID)
+    ProductoNuevo:
+      type: object
+      required: [nombre, precio, stock]
+      properties:
+        nombre: 
+          type: string
+        precio: 
+          type: number
+          minimum: 0
+        stock: 
+          type: integer
+        categoria: 
+          type: string
