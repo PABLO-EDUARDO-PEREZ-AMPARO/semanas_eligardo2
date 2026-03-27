@@ -1,0 +1,1 @@
+![Mi diagrama a mano de SSE](dibujo_sse.jpg)

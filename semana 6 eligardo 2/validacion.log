@@ -1,0 +1,32 @@
+🔌 Iniciando conexión SSE a sse.dev...
+✅ Conexión inicial establecida. Escuchando eventos...
+
+📩 Procesado: precio-actualizado -> {"producto": "A01", "precio": 47}
+📩 Procesado: stock-critico -> {"producto": "B07", "stock": 1}
+📩 Procesado: promo-relampago -> {"producto": "C12", "descuento": "50%"}
+❌ Red caída (ReadTimeout). Reintentando en 3.0s... (Intento 1/5)
+🔄 Reconectando... Headers enviados: {'Accept': 'text/event-stream', 'Last-Event-ID': '3'}
+✅ Conexión inicial establecida. Escuchando eventos...
+📩 Procesado: precio-actualizado -> {"producto": "A01", "precio": 45}
+🛑 [204 No Content] Fin de transmisión.
+
+
+🔌 Iniciando Receptor de Alertas SSE v2...
+
+💻 [UI] Tabla actualizada con nuevo precio: {"producto": "Manzana", "precio": 15.50}
+📝 [Auditoría] Evento guardado. Total en historial: 1
+
+💻 [UI] Tabla actualizada con nuevo precio: {"producto": "Leche 1L", "precio": 22.00}
+📝 [Auditoría] Evento guardado. Total en historial: 2
+
+🚨 [URGENTE] Parpadeo rojo en pantalla. Faltan unidades: {"producto": "Huevo 12p", "quedan": 2}
+📝 [Auditoría] Evento guardado. Total en historial: 3
+
+💻 [UI] Tabla actualizada con nuevo precio: {"producto": "Pan Bimbo", "precio": 45.00}
+📝 [Auditoría] Evento guardado. Total en historial: 4
+
+🚨 [URGENTE] Parpadeo rojo en pantalla. Faltan unidades: {"producto": "Atún Lata", "quedan": 0}
+📝 [Auditoría] Evento guardado. Total en historial: 5
+
+⚠️ Caída de red (Timeout). Reintentando en 5.0s...
+🔌 Iniciando Receptor de Alertas SSE v2...
