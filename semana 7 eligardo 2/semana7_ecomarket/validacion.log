@@ -1,0 +1,51 @@
+🌐 Iniciando conexión a: https://api.ecomarket.com/eventos?modulos=precios,inventario,pedidos
+--------------------------------------------------
+💰 ALERTA PRECIO: Variación > 5% detectada. Nuevo precio: $120.0
+📦 STOCK URGENTE [BAJO]: Quedan 8 unidades.
+🛒 NUEVO PEDIDO VIP: Registrado pedido #2 por $650
+💓 HEARTBEAT: Ping recibido. Conexión activa a las 13:21:48
+⚠️ Alerta CRÍTICA: El handler 'precio-actualizado' falló. Detalle: Error de parseo: JSON inválido recibido en stream de precios.
+📦 STOCK URGENTE [CRÍTICO]: Solo quedan 2 unidades.
+🛒 NUEVO PEDIDO VIP: Registrado pedido #3 por $800
+💓 HEARTBEAT: Ping recibido. Conexión activa a las 13:21:48
+
+Resumen de pedidos VIP guardados localmente: [{'id': 2, 'total': 650}, {'id': 3, 'total': 800}]
+
+
+======================================================================
+REPORTE DE AUDITORÍA (QA) - ESCENARIOS DE FALLO
+======================================================================
+
+[ESCENARIO 1] Datos malformados en medio del stream
+Entrada: event: precio-actualizado / data: ERROR_INTERNO_SERVIDOR_PARSE_FAILED
+Salida en consola: 
+Alerta CRÍTICA: El handler 'precio-actualizado' falló. Detalle: Expecting value: line 1 column 1 (char 0)
+Resultado: CORRECTO. El router capturó la excepción y el programa no se detuvo.
+
+[ESCENARIO 2] Reconexión con Last-Event-ID
+Entrada: Corte de conexión después de recibir el evento con id=5
+Salida interna:
+Guardando self.ultimo_id = '5'
+Generando header HTTP para reconexión: {'Accept': 'text/event-stream', 'Last-Event-ID': '5'}
+Resultado: CORRECTO. El estado del ID se preservó de forma segura durante la caída.
+
+[ESCENARIO 3] Tipo de evento desconocido
+Entrada: event: alerta-fraude / data: {"user": 123}
+Salida en consola: (Ninguna, evento descartado silenciosamente)
+Resultado: CORRECTO. El router comprobó que el evento no estaba en sus handlers y lo ignoró sin lanzar errores.
+
+[ESCENARIO 4] Llamar a iniciar() con conexión ya activa
+Entrada: cliente.iniciar() llamado dos veces seguidas.
+Salida en consola: 
+Aviso: El cliente ya está en uso. Ignorando doble llamada.
+Resultado: CORRECTO. El cliente bloqueó la acción previniendo un stream duplicado en paralelo.
+
+----------------------------------------------------------------------
+COMENTARIO FINAL:
+Los 4 escenarios pasaron sin modificaciones. La arquitectura original de mi código 
+ya contemplaba las validaciones de estado, el manejo de excepciones aislado en el 
+router y la persistencia correcta del Last-Event-ID, por lo que no hubo bugs 
+y no fue necesario actualizar el código ni el docstring.
+======================================================================
+
+todos los esenarios de fallos quedaron iguales por que funsionaron.
