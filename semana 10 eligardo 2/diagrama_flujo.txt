@@ -1,0 +1,31 @@
+======================================================================
+MAPA DE RESPONSABILIDADES Y DIAGRAMA DE FLUJO (RETO 1 Y 2)
+======================================================================
+
+[N1: ClienteRobusto] (Orquestador y Fachada Principal)
+   │
+   ▼
+[N2: TokenManager] (Validación y Seguridad JWT)
+   │
+   ├──► [¿Token Expirado o Inválido?]
+   │       ├──► SÍ: Ejecuta refresh_access_token() Singleton
+   │       └──► NO: Continúa flujo seguro
+   ▼
+[N3: CircuitBreaker] (Guardián de Resiliencia y Fallo Rápido)
+   │
+   ├──► [¿Estado ABIERTO?] ──► SÍ: [Fallo Rápido] Lanza CircuitOpenError
+   │       └──► NO (CERRADO o SEMIABIERTO (Piloto Vencido))
+   ▼
+[N4: Red / Cliente HTTP] (Conexión Física con el Mock)
+   │
+   ├──► [¿Error 401 Unauthorized?] ──► SÍ: Bypass directo (No abre CB)
+   └──► [¿Fallo 5xx / Red?] ─────────► SÍ: Incrementa fallos / Abre CB
+   ▼
+[N5: UI / Sistema de Alertas Logger] (Capa Observable de UI)
+
+
+JUSTIFICACIÓN TÉCNICA DE COMPONENTES:
+- N1 (ClienteRobusto) centraliza el flujo para evitar que la lógica de reintentos y tokens se disperse en la capa de UI.
+- N2 (TokenManager) opera de forma aislada para garantizar que errores de formato en el JWT no bloqueen el circuito de negocio.
+- N3 (CircuitBreaker) maneja un filtrado inteligente de excepciones (INV-A4) para que fallos de login de usuarios no afecten la disponibilidad del backend corporativo.
+======================================================================

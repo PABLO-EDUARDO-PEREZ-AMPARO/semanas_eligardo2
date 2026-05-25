@@ -1,0 +1,18 @@
+2026-05-24 10:00:01 [INFO] [UI] Iniciando simulación de cliente robusto...
+2026-05-24 10:00:01 [INFO] [TM] Token vigente detectado. Pasando al Circuit Breaker.
+2026-05-24 10:00:02 [SUCCESS] [CB] Petición 1 exitosa. Estado: CERRADO.
+2026-05-24 10:00:03 [SUCCESS] [CB] Petición 2 exitosa. Estado: CERRADO.
+2026-05-24 10:00:04 [ERROR] [HTTP] Servidor devolvió HTTP 503 Service Unavailable.
+2026-05-24 10:00:04 [WARNING] [CB] Fallo registrado (1/3). Estado: CERRADO.
+2026-05-24 10:00:05 [ERROR] [HTTP] Servidor devolvió HTTP 503 Service Unavailable.
+2026-05-24 10:00:05 [WARNING] [CB] Fallo registrado (2/3). Estado: CERRADO.
+2026-05-24 10:00:06 [ERROR] [HTTP] Servidor devolvió HTTP 503 Service Unavailable.
+2026-05-24 10:00:06 [CRITICAL] [CB] Umbral de fallos alcanzado (3/3). Transición a ABIERTO.
+2026-05-24 10:00:07 [ERROR] [CB] Petición 6 rechazada: CircuitOpenError (Fallo rápido - protegiendo el sistema).
+2026-05-24 10:00:08 [ERROR] [CB] Petición 7 rechazada: CircuitOpenError (Fallo rápido - protegiendo el sistema).
+2026-05-24 10:00:12 [INFO] [CB] Tiempo de gracia finalizado. Transición a SEMIABIERTO (Piloto).
+2026-05-24 10:00:12 [INFO] [TM] Token próximo a expirar detectado.
+2026-05-24 10:00:12 [INFO] [TM] Renovando token de acceso...
+2026-05-24 10:00:13 [INFO] [CB] Enviando petición piloto con credenciales frescas...
+2026-05-24 10:00:14 [SUCCESS] [CB] Prueba exitosa. Transición a CERRADO.
+2026-05-24 10:00:15 [SUCCESS] [UI] Conexión normalizada. Catálogo e Inventario completamente disponibles.
